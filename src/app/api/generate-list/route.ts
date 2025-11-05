@@ -1,6 +1,5 @@
 export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function GET() {
   return NextResponse.json({ 
@@ -15,20 +14,15 @@ export async function POST(req: NextRequest) {
   try {
     console.log("=== GENERATING BABY PRODUCTS WITH GEMINI ===");
     console.log("API Key exists:", !!process.env.GEMINI_API_KEY);
-    console.log("API Key length:", process.env.GEMINI_API_KEY?.length || 0);
     
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
     
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
     const { userInput } = (await req.json()) as { userInput: string };
     console.log("User input:", userInput);
 
     console.log("Calling Google Gemini...");
-    
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     
     const prompt = `You are TotsyList, a baby product shopping expert. Your task is to help a parent find all the products they need for their planned activity in one place. You are helping them parse through all the products available on the web with ease. Be comprehensive. This parent is relying on you. Consider yourself their best friend who has a baby and wants to make sure they are covered with everything that they need to buy. They shouldn't have to go anywhere else for info but here. Generate a comprehensive baby product list for: "${userInput}"
 
@@ -70,11 +64,27 @@ IMPORTANT:
 
 Return ONLY the JSON, no other text.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // Use direct fetch like SxS (working approach)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API responded with ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Gemini API response received");
     
-    console.log("Gemini responded successfully!");
+    if (!data.candidates || !data.candidates[0]) {
+      throw new Error("No response from Gemini API");
+    }
+    
+    const text = data.candidates[0].content.parts[0].text;
     console.log("Raw response:", text.substring(0, 200) + "...");
     
     // Clean up the response (remove any markdown formatting)
@@ -88,8 +98,6 @@ Return ONLY the JSON, no other text.`;
     
     const json = JSON.parse(cleanText);
     console.log("Generated categories:", json.categories?.length || 0);
-    console.log("Category names:", json.categories?.map((cat: any) => cat.category) || []);
-    console.log("Items per category:", json.categories?.map((cat: any) => `${cat.category}: ${cat.items?.length || 0} items`) || []);
 
     return NextResponse.json(json, { status: 200 });
     
@@ -98,12 +106,6 @@ Return ONLY the JSON, no other text.`;
     console.error("Error type:", typeof error);
     console.error("Error message:", error.message);
     console.error("Error stack:", error.stack);
-    console.error("Full error:", error);
-    
-    // Check if it's a Gemini API error
-    if (error.message?.includes('API key')) {
-      console.error("API KEY ISSUE - Check your GEMINI_API_KEY");
-    }
     
     // Return proper structure even on error
     return NextResponse.json({ 
