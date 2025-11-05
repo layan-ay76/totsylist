@@ -23,26 +23,19 @@ export async function POST(req: NextRequest) {
     const { userInput } = (await req.json()) as { userInput: string };
     console.log("User input:", userInput);
 
-    // Try different model names until one works
-    const modelNames = ["gemini-1.5-pro-latest", "gemini-1.5-pro", "gemini-pro", "gemini-1.0-pro"];
+    // Test with just one model that should work
+    console.log("Testing with gemini-1.5-flash model...");
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    let result;
-    let workingModel = "";
-    
-    for (const modelName of modelNames) {
-      try {
-        console.log(`Trying model: ${modelName}`);
-        const model = genAI.getGenerativeModel({ model: modelName });
-        
-        const prompt = `You are TotsyList, a baby product shopping expert. Generate a comprehensive baby product list for: "${userInput}"
+    const prompt = `Generate a JSON list of baby travel products for: "${userInput}"
 
-Return ONLY valid JSON with this structure:
+Return this exact JSON structure:
 {
   "summary": {
     "due_date": "Travel with toddler",
     "budget": "moderate", 
-    "key_prefs": ["travel-friendly", "toddler-safe"],
-    "disclaimers": ["Generated recommendations based on travel needs"]
+    "key_prefs": ["travel-friendly"],
+    "disclaimers": ["AI generated recommendations"]
   },
   "categories": [
     {
@@ -52,30 +45,17 @@ Return ONLY valid JSON with this structure:
         {
           "name": "Toddler Travel Harness",
           "brand": "Munchkin", 
-          "why": "Keeps toddler secure during flight",
+          "why": "Safety during flight",
           "eco_friendly": false,
           "est_price_usd": 25,
-          "url": "https://www.amazon.com/dp/B001234567"
+          "url": "https://www.amazon.com/dp/sample"
         }
       ]
     }
   ]
 }`;
 
-        result = await model.generateContent(prompt);
-        workingModel = modelName;
-        console.log(`Success with model: ${modelName}`);
-        break;
-      } catch (error: any) {
-        console.log(`Model ${modelName} failed:`, error.message || error);
-        console.log(`Full error for ${modelName}:`, error);
-        continue;
-      }
-    }
-    
-    if (!result) {
-      throw new Error("All Gemini models failed");
-    }
+    const result = await model.generateContent(prompt);
     
     const response = await result.response;
     const text = response.text();
