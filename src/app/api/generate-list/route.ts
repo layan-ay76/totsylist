@@ -60,7 +60,7 @@ Return this exact JSON structure:
     const response = await result.response;
     const text = response.text();
     
-    console.log(`Working model: ${workingModel}`);
+    console.log("Gemini API success!");
     console.log("Raw response:", text.substring(0, 200) + "...");
     
     // Clean up the response
