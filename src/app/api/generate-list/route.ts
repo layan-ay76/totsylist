@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     console.log("Calling Google Gemini...");
     
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     
     const prompt = `You are TotsyList, a baby product shopping expert. Your task is to help a parent find all the products they need for their planned activity in one place. You are helping them parse through all the products available on the web with ease. Be comprehensive. This parent is relying on you. Consider yourself their best friend who has a baby and wants to make sure they are covered with everything that they need to buy. They shouldn't have to go anywhere else for info but here. Generate a comprehensive baby product list for: "${userInput}"
 
