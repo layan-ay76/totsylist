@@ -2,15 +2,26 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
 export async function GET() {
-  return NextResponse.json({ ok: true, where: "/api/generate-list" });
+  return NextResponse.json({ 
+    ok: true, 
+    where: "/api/generate-list",
+    hasApiKey: !!process.env.GEMINI_API_KEY,
+    keyLength: process.env.GEMINI_API_KEY?.length || 0
+  });
 }
 
 export async function POST(req: NextRequest) {
   try {
     console.log("=== GENERATING BABY PRODUCTS WITH GEMINI ===");
+    console.log("API Key exists:", !!process.env.GEMINI_API_KEY);
+    console.log("API Key length:", process.env.GEMINI_API_KEY?.length || 0);
+    
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY environment variable is not set");
+    }
+    
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     
     const { userInput } = (await req.json()) as { userInput: string };
     console.log("User input:", userInput);
