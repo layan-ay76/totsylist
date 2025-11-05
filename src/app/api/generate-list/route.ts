@@ -64,8 +64,8 @@ IMPORTANT:
 
 Return ONLY the JSON, no other text.`;
 
-    // Use direct fetch like SxS (working approach)
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+    // Use v1 API instead of v1beta with correct model
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
