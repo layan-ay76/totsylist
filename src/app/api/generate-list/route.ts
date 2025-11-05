@@ -3,6 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function GET() {
+  // List available models to debug
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
+      const models = await response.json();
+      console.log("Available models:", models);
+      return NextResponse.json({ 
+        ok: true, 
+        where: "/api/generate-list",
+        hasApiKey: true,
+        keyLength: process.env.GEMINI_API_KEY.length,
+        availableModels: models
+      });
+    } catch (error) {
+      console.error("Error listing models:", error);
+    }
+  }
+  
   return NextResponse.json({ 
     ok: true, 
     where: "/api/generate-list",
