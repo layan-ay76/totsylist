@@ -4,7 +4,7 @@ import { mockBabyRegistryData } from "@/app/lib/mockData";
 
 export default function GenerateButton({ onResult }: { onResult: (data: any) => void }) {
   const [input, setInput] = useState(
-    "I am having a baby on 02/15 and I want eco-friendly products that are midtier budget."
+    "I am traveling with a toddler what do I need to take with me on the flight"
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +52,7 @@ export default function GenerateButton({ onResult }: { onResult: (data: any) => 
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="w-full h-32 border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="e.g., Having a baby on 12/20, prefer eco-friendly midtier items, neutral colors, need essentials for newborn..."
+          placeholder="I am traveling with a toddler what do I need to take with me on the flight"
         />
         
         <button
