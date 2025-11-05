@@ -41,9 +41,9 @@ export async function POST(req: NextRequest) {
     const { userInput } = (await req.json()) as { userInput: string };
     console.log("User input:", userInput);
 
-    // Use the basic gemini-pro model which should be available in v1beta
-    console.log("Testing with gemini-pro model...");
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Use gemini-2.5-flash which is available and stable
+    console.log("Using gemini-2.5-flash model...");
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     const prompt = `Generate a JSON list of baby travel products for: "${userInput}"
 
