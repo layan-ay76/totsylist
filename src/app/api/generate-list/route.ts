@@ -66,7 +66,7 @@ Return ONLY valid JSON with this structure:
         workingModel = modelName;
         console.log(`Success with model: ${modelName}`);
         break;
-      } catch (error) {
+      } catch (error: any) {
         console.log(`Model ${modelName} failed:`, error.message);
         continue;
       }
